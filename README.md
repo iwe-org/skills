@@ -1,2 +1,3 @@
-# skills
-Agentic AI skills for knowledge graph management
+## IWE Agentic AI Skills
+
+Main repository is here https://github.com/iwe-org/iwe
