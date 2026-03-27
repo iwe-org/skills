@@ -7,7 +7,7 @@ Official docs:
 - `iwe new`: https://iwe.md/docs/cli/new/
 - Extract actions: https://iwe.md/docs/code-actions/extract/
 - Inline notes: https://iwe.md/docs/code-actions/inline/
-- Files renaming: https://iwe.md/docs/features/renaming/
+- File renaming: https://iwe.md/docs/features/renaming/
 - Agentic tools: https://iwe.md/docs/agentic/
 
 ## `iwe new`
