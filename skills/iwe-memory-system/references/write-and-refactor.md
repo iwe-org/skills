@@ -155,7 +155,7 @@ Current behavior worth knowing:
 - Create a note: `iwe new`
 - Split a section out structurally: `iwe extract`
 - Merge linked content back into context: `iwe inline`
-- Change a note key or path: `iwe rename`
+- Change a document key, including path-like keys: `iwe rename`
 - Remove a note safely: `iwe delete`
 
 If the user asks for a structural change and the CLI supports it, use the CLI instead of editing markdown references by hand. If exact arguments still matter, run `iwe <command> --help`. After a write operation, inspect affected files or rerun `find` or `retrieve` to confirm the graph state.

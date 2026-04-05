@@ -120,7 +120,7 @@ Useful examples:
 
 ```bash
 iwe stats
-iwe stats --format csv > stats.csv
+iwe stats -f csv > stats.csv
 iwe stats -f csv | tail -n +2 | sort -t, -k12 -nr | head -5
 ```
 
@@ -128,6 +128,7 @@ Use `stats` before proposing large reorganizations. Prefer `csv` only when anoth
 
 Current formats:
 
+- `-f` and `--format` are equivalent
 - `-f markdown`: overview plus reference, size, structure, and network sections
 - `-f csv`: per-document rows with graph and content metrics
 
