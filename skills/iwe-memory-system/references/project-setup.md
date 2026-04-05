@@ -18,50 +18,86 @@ An IWE project is identified by:
 
 Running `iwe init` creates that directory and file.
 
-## Important config fields
+## Example config
 
-Read `.iwe/config.toml` before assuming file locations or defaults.
+Read `.iwe/config.toml` before assuming file locations or defaults. A generated config looks like this:
 
-### `library.path`
+```toml
+# Generated config also contains a top-level `version` field.
 
-- `""`: markdown files live at project root
-- `"docs"` or another path: markdown files live in that subdirectory
+[markdown]
+# "" means links are written without an extension, e.g. [Doc](key)
+# instead of [Doc](key.md).
+refs_extension = ""
 
-### `library.default_template`
+# Date format used when templates render dates into document content.
+date_format = "%b %d, %Y"
 
-- Optional default template name for `iwe new`
+[library]
+# Where markdown notes live relative to the project root.
+# "" means the root directory itself. "docs" would mean ./docs/.
+path = ""
 
-### `markdown.refs_extension`
+# Date format used by key-oriented template variables such as {{today}}.
+date_format = "%Y-%m-%d"
 
-- Controls whether references use no extension or something like `.md`
+# Optional. If set, plain `iwe new "Title"` uses this template.
+# default_template = "journal"
 
-### `completion.link_format`
+[completion]
+# Optional. Can be used to prefer markdown or wiki links in completions.
+# link_format = "markdown"
 
-- May indicate whether the project prefers markdown links or wiki links
+[commands.default]
+# Default command used by transform-style actions.
+run = "claude -p"
+timeout_seconds = 120
 
-## `iwe init`
+[actions.extract]
+type = "extract"
+title = "Extract"
+link_type = "markdown"
+key_template = "{{id}}"
 
-Basic usage:
+[actions.extract_all]
+type = "extract_all"
+title = "Extract all subsections"
+link_type = "markdown"
+key_template = "{{id}}"
 
-```bash
-iwe init
+[actions.inline_section]
+type = "inline"
+title = "Inline section"
+inline_type = "section"
+keep_target = false
+
+[actions.inline_quote]
+type = "inline"
+title = "Inline quote"
+inline_type = "quote"
+keep_target = false
+
+[templates.default]
+# File key/path for `iwe new`.
+key_template = "{{slug}}"
+
+# Initial markdown content for `iwe new`.
+document_template = """
+# {{title}}
+
+{{content}}"""
 ```
 
-What it creates:
+## What to look at first
 
-```text
-.iwe/
-└── config.toml
-```
-
-Safe assumptions:
-
-- Re-running `iwe init` in an existing project does not overwrite the config.
-- The default config also defines extract, inline, and template behavior.
+- `library.path`: determines where notes actually live.
+- `library.default_template`: changes what plain `iwe new` uses.
+- `markdown.refs_extension`: affects whether links include `.md`.
+- `actions.*`: `iwe extract --action ...` and `iwe inline --action ...` resolve here.
+- `templates.*`: controls how `iwe new` names files and renders content.
 
 ## Working notes
 
-- Check config before searching for note files manually.
-- If `iwe` behavior seems surprising, inspect `.iwe/config.toml` before assuming a bug.
-- When creating new notes, prefer `iwe new` so project templates and naming rules are respected.
-- Do not assume the project uses any particular graph structure or file naming convention beyond what the workspace itself shows.
+- Check `.iwe/config.toml` before searching for note files manually.
+- If `iwe` behavior seems surprising, inspect config before assuming a bug.
+- Re-running `iwe init` in an existing project does not overwrite the config.

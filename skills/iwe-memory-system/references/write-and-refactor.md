@@ -28,6 +28,15 @@ iwe new "Daily Journal" --template journal
 
 Prefer `iwe new` over creating files by hand. The command prints the created absolute path, and `--template` only works when that template exists in `.iwe/config.toml`.
 
+Current behavior worth knowing:
+
+- `--if-exists` supports `suffix`, `override`, and `skip`
+- `--edit` opens the created file in `$EDITOR`
+- `--content` can be replaced with piped stdin content
+- Current template variables include `{{title}}`, `{{slug}}`, `{{content}}`, `{{id}}`, `{{now}}`, and `{{today}}`
+- If `library.default_template` is set, plain `iwe new` uses that template automatically
+- If `library.path` points to a subdirectory, created files are written there
+
 ## `iwe extract`
 
 Use `extract` when a section should become its own note.
@@ -44,6 +53,14 @@ iwe extract my-document --section "Design" --dry-run
 ```
 
 Use `--list` when the target is unclear, `--section` when the title is known, `--block` when titles are ambiguous, and `--dry-run` before structural edits.
+
+Current behavior worth knowing:
+
+- `--block` is 1-indexed
+- `--list` shows block numbers for the current document structure, including the root block and extractable sections
+- `--action <NAME>` uses an extract action from `.iwe/config.toml`
+- `--keys` prints affected document keys
+- `--quiet` suppresses progress output
 
 ## `iwe inline`
 
@@ -64,11 +81,20 @@ iwe inline my-document --reference "design" --dry-run
 
 Use `--list` when the target is unclear, `--reference` when the note is known, `--block` when references repeat, `--keep-target` when this should stay an embed instead of a merge, `--as-quote` when markdown structure matters, and `--dry-run` before structural edits.
 
+Current behavior worth knowing:
+
+- `--block` is 1-indexed
+- `--reference` can match by key or by the displayed reference title
+- `--action <NAME>` uses an inline action from `.iwe/config.toml`
+- Without `--keep-target`, the target document is deleted and other references are cleaned up
+- `--keys` prints affected document keys
+- `--quiet` suppresses progress output
+
 ## `iwe rename`
 
-Use `rename` when a note key or file path should change without breaking references.
+Use `rename` when a document key should change without breaking references.
 
-`rename` changes a note key or path and updates references to keep the graph consistent.
+`rename` changes a document key and updates references to keep the graph consistent. Keys may include path segments, so this also covers path-like renames within the library.
 
 Official CLI examples:
 
@@ -79,7 +105,12 @@ iwe rename old-topic new-topic --quiet
 iwe rename old-topic new-topic --keys
 ```
 
-Use `--dry-run` before a rename that may touch many references. Use `--keys` when another step should inspect affected documents.
+Use `--dry-run` before a rename that may touch many references. Use `--keys` when another step should inspect affected documents. `--quiet` suppresses progress output.
+
+Current behavior worth knowing:
+
+- `NEW_KEY` can include path segments such as `reference/api-contract`
+- `--keys` prints the affected set, which can include the new key, updated referring documents, and the old key
 
 ## `iwe delete`
 
@@ -97,6 +128,27 @@ iwe delete document-key --keys
 ```
 
 Treat `delete` as high-impact. Use `--dry-run` before deletion unless the user explicitly wants immediate execution. `--force` removes the confirmation boundary.
+
+Current behavior worth knowing:
+
+- Without `--force`, `delete` prompts for confirmation
+- `--keys` prints affected document keys, including the deleted key when applicable
+- `--quiet` suppresses progress output
+
+## `iwe normalize`
+
+Use `normalize` for in-place cleanup across the whole library.
+
+```bash
+iwe normalize
+```
+
+Current behavior worth knowing:
+
+- `normalize` rewrites files in place across the project
+- It updates formatting and link titles to match the current graph
+- If standalone links are not separated by blank lines, normalization can merge them onto one line and turn them into inline links
+- Treat it as a bulk write operation, not as a read-only check
 
 ## Command selection guide
 
