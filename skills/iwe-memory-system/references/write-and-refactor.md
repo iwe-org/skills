@@ -9,6 +9,9 @@ Official docs:
 - Inline notes: https://iwe.md/docs/code-actions/inline/
 - File renaming: https://iwe.md/docs/features/renaming/
 - Agentic tools: https://iwe.md/docs/agentic/
+- Query language: https://iwe.md/docs/concepts/query-language/
+
+For `--filter` syntax used by `iwe update` and `iwe delete`, see [./query-language.md](./query-language.md).
 
 ## `iwe new`
 
@@ -112,11 +115,49 @@ Current behavior worth knowing:
 - `NEW_KEY` can include path segments such as `reference/api-contract`
 - `--keys` prints the affected set, which can include the new key, updated referring documents, and the old key
 
+## `iwe update`
+
+Use `update` for two distinct write modes: rewriting the markdown body of one document, or mutating frontmatter on a set of documents selected by a filter.
+
+### Body-overwrite mode
+
+```bash
+iwe update -k notes/draft -c "# Draft\n\nNew content."
+cat new-content.md | iwe update -k notes/draft -c -
+```
+
+`-k KEY` and `-c CONTENT` together replace the markdown body of one document. Use `-` as content to read from stdin. This mode does not touch frontmatter.
+
+### Frontmatter-mutation mode
+
+```bash
+iwe update -k notes/draft --set status=published --set priority=10
+iwe update --filter 'status: draft' --set 'reviewed=true'
+iwe update --filter 'status: archived' --unset draft_notes
+iwe update --filter 'status: draft' --set status=published --dry-run
+```
+
+`--set FIELD=VALUE` parses the value as a YAML scalar:
+
+- `--set 'priority=5'` writes integer `5`
+- `--set 'reviewed=true'` writes boolean `true`
+- `--set 'status=draft'` writes string `"draft"`
+- `--set 'tags=[a, b]'` writes a list
+- `--set 'count="5"'` writes string `"5"` (quoted)
+
+Behavior worth knowing:
+
+- Body and frontmatter modes cannot be combined; use two passes if both must change.
+- `--filter '{}'` would target every document; do not run that without explicit user intent.
+- Reserved-prefix fields (`_`, `$`, `.`, `#`, `@`) cannot be `$set` or `$unset`.
+- Frontmatter is re-serialized as YAML 1.2 after mutation, so quote styles on untouched fields may change.
+- Always run `--dry-run` before bulk mutations.
+
 ## `iwe delete`
 
 Use `delete` when a document should be removed and the graph should be cleaned up.
 
-`delete` removes the note, removes inclusion links to it, and converts inline links to plain text.
+`delete` removes the note, removes inclusion links to it, and converts inline links to plain text. Targets are selected by either a positional `KEY` (sugar for `--filter '$key: K'`) or a `--filter` expression. Both may be given; the union is deleted.
 
 Useful examples:
 
@@ -124,16 +165,20 @@ Useful examples:
 iwe delete document-key
 iwe delete document-key --force
 iwe delete document-key --dry-run
-iwe delete document-key --keys
+iwe delete --filter 'status: archived'
+iwe delete --filter '$and: [{ type: scratch }, { reviewed: false }]' --dry-run
+iwe delete --filter 'status: archived' -f keys
 ```
 
-Treat `delete` as high-impact. Use `--dry-run` before deletion unless the user explicitly wants immediate execution. `--force` removes the confirmation boundary.
+Treat `delete` as high-impact. Use `--dry-run` before deletion unless the user explicitly wants immediate execution. `--force` removes the confirmation boundary on key-based deletes.
 
 Current behavior worth knowing:
 
-- Without `--force`, `delete` prompts for confirmation
-- `--keys` prints affected document keys, including the deleted key when applicable
+- Without `--force`, key-based `delete` prompts for confirmation
+- Filter-based deletes can match many documents at once; preview with `--dry-run` and confirm the count with `iwe count --filter '...'` first
+- `-f keys` prints affected document keys (target plus every document whose references were rewritten), suitable for piping
 - `--quiet` suppresses progress output
+- `--filter '{}'` targets the entire corpus; do not run that without explicit user intent
 
 ## `iwe normalize`
 
@@ -156,6 +201,8 @@ Current behavior worth knowing:
 - Split a section out structurally: `iwe extract`
 - Merge linked content back into context: `iwe inline`
 - Change a document key, including path-like keys: `iwe rename`
-- Remove a note safely: `iwe delete`
+- Remove a note safely: `iwe delete` (positional key) or `iwe delete --filter ...`
+- Rewrite the body of a single note: `iwe update -k KEY -c CONTENT`
+- Mutate frontmatter on one or many notes: `iwe update [--filter ...|-k KEY] --set / --unset`
 
 If the user asks for a structural change and the CLI supports it, use the CLI instead of editing markdown references by hand. If exact arguments still matter, run `iwe <command> --help`. After a write operation, inspect affected files or rerun `find` or `retrieve` to confirm the graph state.

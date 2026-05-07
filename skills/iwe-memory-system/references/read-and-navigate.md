@@ -7,7 +7,10 @@ Official docs:
 - Agentic tools: https://iwe.md/docs/agentic/
 - CLI reference: https://iwe.md/docs/cli/
 - CLI workflows: https://iwe.md/docs/cli/workflows/
+- Query language: https://iwe.md/docs/concepts/query-language/
 - `iwe squash`: https://iwe.md/docs/cli/squash/
+
+For full filter syntax (operators, graph operators, projection, sort, `$set` / `$unset`), see [./query-language.md](./query-language.md). The sections below show how each read command consumes filter expressions.
 
 ## `iwe find`
 
@@ -30,17 +33,31 @@ Useful examples:
 ```bash
 iwe find "authentication" --roots -f keys
 iwe find --roots -f json
-iwe find --refs-to authentication
-iwe find --refs-from index
+iwe find --references authentication              # docs that reference authentication
+iwe find --referenced-by index                    # docs that index references
 iwe find "$QUERY" --limit 5 -f keys
 ```
 
+Frontmatter filter, projection, sort, and limit:
+
+```bash
+iwe find --filter 'status: draft'
+iwe find --filter 'priority: { $gt: 3 }' --sort modified_at:-1
+iwe find --filter '$or: [{ status: draft }, { status: review }]' -f keys
+iwe find --included-by projects/alpha:5 --filter 'type: note'
+iwe find --project title,status -f json
+iwe find --add-fields 'body=$content' -f json
+```
+
+Inline-YAML filters compose with the positional fuzzy query and the graph anchor flags via AND. See [./query-language.md](./query-language.md) for the full operator set.
+
 Workflow:
 
-1. Start with `iwe find "topic"`.
-2. If results are broad, add `--roots` or `--limit`.
-3. Use `--refs-to` or `--refs-from` when you already know one anchor key and want relationship-based discovery.
-4. Pass the chosen key into `retrieve`.
+1. Start with `iwe find "topic"` for fuzzy discovery, or `iwe find --filter '...'` when you know the frontmatter shape.
+2. If results are broad, add `--roots`, `--limit`, or a tighter `--filter`.
+3. Use `--references` / `--referenced-by` / `--includes` / `--included-by` when you already know one anchor key and want relationship-based discovery.
+4. Use `--project` or `--add-fields` to shape JSON output before passing it on.
+5. Pass the chosen key into `retrieve`.
 
 ## `iwe tree`
 
@@ -57,6 +74,8 @@ iwe tree
 iwe tree --depth 5
 iwe tree -k project-overview
 iwe tree -f json
+iwe tree --filter 'status: published'        # roots become docs with status==published
+iwe tree --project status -f json            # add status to each tree node
 ```
 
 Current behavior worth knowing:
@@ -107,6 +126,40 @@ iwe retrieve -k login-flow -e authentication
 ```
 
 That is the core loop: discover an entry point, retrieve enough context, then follow adjacent notes with `-e` to avoid duplication.
+
+## `iwe count`
+
+Use `count` when the question is "how many?" rather than "which ones?". It accepts the same filter and graph flags as `find` and prints a single integer.
+
+```bash
+iwe count
+iwe count --filter 'status: draft'
+iwe count --filter 'priority: { $gte: 3 }'
+iwe count --included-by projects/alpha
+iwe count --included-by projects/alpha:5
+```
+
+Use `count` to size up a filter before running `find`, `update`, or `delete` against it. Combine with `--limit` to short-circuit large workspaces.
+
+## `iwe schema`
+
+Use `schema` to infer the frontmatter schema across the workspace. It is the right starting point before composing a non-trivial filter, because it shows which fields exist, their types, coverage, and (for low-cardinality fields) the actual value distribution.
+
+```bash
+iwe schema
+iwe schema --filter 'type: post'
+iwe schema --field status
+iwe schema --field engagement -f json
+iwe schema -f json > schema.json
+```
+
+Current behavior worth knowing:
+
+- Only enumerable values are listed: null, booleans, numbers, and strings made of `[A-Za-z0-9_.-/]`. Free-text values are counted in coverage and types but not in the values listing.
+- Value distribution is omitted for fields with more than 100 distinct enumerable values.
+- `--filter` restricts analysis to a subset; `--field` drills into one field and its children.
+- `--project` and `--add-fields` do not apply here; `schema` always reads raw frontmatter.
+- Formats: `markdown` (aligned table), `json`, `yaml`.
 
 ## `iwe stats`
 
