@@ -19,7 +19,7 @@ Read this file only when stderr does not explain the failure or when deciding wh
 ## Stable classifications
 
 - `iwe_unavailable`: executable cannot be started.
-- `unsupported_cli_version`: installed CLI is outside the 0.18 line.
+- `unsupported_cli_version`: installed CLI is older than 0.18.
 - `cli_contract_mismatch`: a known command or option is rejected.
 - `unsupported_operation`: IWE explicitly cannot perform the requested operation.
 

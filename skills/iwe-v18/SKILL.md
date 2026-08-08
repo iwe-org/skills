@@ -1,7 +1,7 @@
 ---
 name: iwe-v18
 description: Use IWE CLI to find, retrieve, analyze, create, update, or safely refactor an IWE Markdown knowledge graph.
-compatibility: Requires IWE CLI >=0.18.0, <0.19.0.
+compatibility: Requires IWE CLI >=0.18.0.
 metadata:
   version: "0.9.9"
 ---
