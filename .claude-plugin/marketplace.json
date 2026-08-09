@@ -1,0 +1,12 @@
+{
+  "name": "iwe-org",
+  "description": "Agent skills for IWE, the Markdown knowledge-graph tool",
+  "owner": { "name": "iwe-org", "url": "https://github.com/iwe-org" },
+  "plugins": [
+    {
+      "name": "iwe",
+      "source": "./",
+      "description": "IWE CLI skills for Markdown knowledge graphs"
+    }
+  ]
+}

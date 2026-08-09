@@ -14,10 +14,17 @@ Requirements:
 - IWE CLI `>=0.18.0` — install via `npm install -g @iwe-org/iwe`, `brew tap iwe-org/iwe && brew install iwe`, or `cargo install iwe`;
 - an agent runtime that supports skills.
 
-Install with:
+Install with the skills CLI (works with Claude Code, Codex, Cursor, OpenCode, and many other agents):
 
 ```bash
 npx skills add iwe-org/skills --skill iwe-v18
+```
+
+Claude Code users can also install natively as a plugin:
+
+```
+/plugin marketplace add iwe-org/skills
+/plugin install iwe@iwe-org
 ```
 
 See the [skill](skills/iwe-v18/SKILL.md), the [IWE repository](https://github.com/iwe-org/iwe), and the [IWE documentation](https://iwe.md/docs/) for details.
