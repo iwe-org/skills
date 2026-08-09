@@ -11,7 +11,7 @@ Use `iwe-v18` with IWE CLI 0.18 and later. It gives agents bounded, graph-aware 
 Requirements:
 
 - an IWE workspace;
-- IWE CLI `>=0.18.0`;
+- IWE CLI `>=0.18.0` — install via `npm install -g @iwe-org/iwe`, `brew tap iwe-org/iwe && brew install iwe`, or `cargo install iwe`;
 - an agent runtime that supports skills.
 
 Install with:
