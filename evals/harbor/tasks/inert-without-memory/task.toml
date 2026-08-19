@@ -1,0 +1,42 @@
+schema_version = "1.4"
+multi_step_reward_strategy = "mean"
+
+[task]
+name = "iwe/inert-without-memory"
+version = "0.1.0"
+description = "Without a MEMORY.md document the plugin does nothing at all — in a workspace or outside one — and the transcript it left alone is still capturable from line zero once the policy exists."
+
+[metadata]
+category = "memory"
+tags = ["iwe", "memory", "inert", "policy"]
+
+[environment]
+docker_image = "iwe-memory-evals:latest"
+workdir = "/app"
+network_mode = "public"
+build_timeout_sec = 900.0
+
+[agent]
+timeout_sec = 900.0
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "shared"
+
+[[steps]]
+name = "plain"
+
+[steps.agent]
+timeout_sec = 900.0
+
+[steps.verifier]
+timeout_sec = 300.0
+
+[[steps]]
+name = "enabled"
+
+[steps.agent]
+timeout_sec = 900.0
+
+[steps.verifier]
+timeout_sec = 300.0

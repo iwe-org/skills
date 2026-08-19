@@ -1,0 +1,43 @@
+schema_version = "1.4"
+multi_step_reward_strategy = "mean"
+
+[task]
+name = "iwe/probe-hooks"
+version = "0.1.0"
+description = "Diagnostic: which IWE memory hooks fire under headless Claude Code, whether the Stop block is honored, whether a background capture finishes, and whether step log directories are shared."
+
+[metadata]
+category = "diagnostic"
+tags = ["iwe", "memory", "hooks"]
+
+[environment]
+docker_image = "iwe-memory-evals:latest"
+workdir = "/app"
+network_mode = "public"
+build_timeout_sec = 900.0
+env = { IWE_DEBUG = "1" }
+
+[agent]
+timeout_sec = 600.0
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "shared"
+
+[[steps]]
+name = "fire"
+
+[steps.agent]
+timeout_sec = 600.0
+
+[steps.verifier]
+timeout_sec = 300.0
+
+[[steps]]
+name = "carryover"
+
+[steps.agent]
+timeout_sec = 600.0
+
+[steps.verifier]
+timeout_sec = 300.0

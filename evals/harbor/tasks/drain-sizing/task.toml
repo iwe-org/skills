@@ -1,0 +1,33 @@
+schema_version = "1.4"
+multi_step_reward_strategy = "mean"
+
+[task]
+name = "iwe/drain-sizing"
+version = "0.1.0"
+description = "A backfill drained at the larger chunk budget: fewer, bigger chunks over the same span, the facts the default budget keeps still kept, and the one it truncates away delivered whole."
+
+[metadata]
+category = "memory"
+tags = ["iwe", "memory", "backfill", "cost"]
+
+[environment]
+docker_image = "iwe-memory-evals:latest"
+workdir = "/app"
+network_mode = "public"
+build_timeout_sec = 900.0
+
+[agent]
+timeout_sec = 1200.0
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "shared"
+
+[[steps]]
+name = "backfill"
+
+[steps.agent]
+timeout_sec = 1200.0
+
+[steps.verifier]
+timeout_sec = 300.0

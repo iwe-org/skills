@@ -1,7 +1,7 @@
 {
   "name": "iwe",
-  "description": "IWE CLI skills for finding, retrieving, creating, and safely refactoring Markdown knowledge graphs",
-  "version": "0.9.9",
+  "description": "IWE Memory — durable agent memory as markdown in the repository's own IWE workspace — plus CLI skills for finding, retrieving, creating, and safely refactoring Markdown knowledge graphs",
+  "version": "0.12.0",
   "author": { "name": "iwe-org" },
   "homepage": "https://iwe.md",
   "repository": "https://github.com/iwe-org/skills"

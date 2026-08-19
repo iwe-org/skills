@@ -1,0 +1,42 @@
+schema_version = "1.4"
+multi_step_reward_strategy = "mean"
+
+[task]
+name = "iwe/memory-knobs"
+version = "0.1.0"
+description = "The mechanical knobs in the MEMORY.md frontmatter are honored: a raised sweep threshold keeps the sweep silent, lowering it makes it import chunks under the one prefix the machinery owns, with the item cap the policy sets."
+
+[metadata]
+category = "memory"
+tags = ["iwe", "memory", "policy", "configuration"]
+
+[environment]
+docker_image = "iwe-memory-evals:latest"
+workdir = "/app"
+network_mode = "public"
+build_timeout_sec = 900.0
+
+[agent]
+timeout_sec = 900.0
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "shared"
+
+[[steps]]
+name = "quiet"
+
+[steps.agent]
+timeout_sec = 900.0
+
+[steps.verifier]
+timeout_sec = 300.0
+
+[[steps]]
+name = "loud"
+
+[steps.agent]
+timeout_sec = 900.0
+
+[steps.verifier]
+timeout_sec = 300.0

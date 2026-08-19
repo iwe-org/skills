@@ -1,0 +1,4 @@
+interface:
+  display_name: "IWE"
+  short_description: "Navigate and refactor IWE knowledge graphs"
+  default_prompt: "Use $graph to inspect and safely refactor this IWE knowledge graph."
