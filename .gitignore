@@ -1,0 +1,25 @@
+### macOS
+# Finder metadata
+.DS_Store
+
+# Thumbnails
+._*
+
+# Custom folder icons
+Icon
+
+# Volume root files
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+# Harbor eval image: locally built iwe binary staged for IWE_SOURCE=copy
+evals/harbor/image/bin/
+
+# Harbor run artifacts (trial logs, transcripts, verifier bundles)
+jobs/
+.iwe
+private

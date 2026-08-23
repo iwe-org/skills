@@ -1,0 +1,33 @@
+schema_version = "1.4"
+multi_step_reward_strategy = "mean"
+
+[task]
+name = "iwe/distill-skill"
+version = "0.1.0"
+description = "The interactive write path: 'remember this' with two facts, one novel and one that sharpens a document already in the store. The novel one becomes a new document; the known one updates in place."
+
+[metadata]
+category = "memory"
+tags = ["iwe", "memory", "distill", "dedup"]
+
+[environment]
+docker_image = "iwe-memory-evals:latest"
+workdir = "/app"
+network_mode = "public"
+build_timeout_sec = 900.0
+
+[agent]
+timeout_sec = 900.0
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "shared"
+
+[[steps]]
+name = "remember"
+
+[steps.agent]
+timeout_sec = 900.0
+
+[steps.verifier]
+timeout_sec = 300.0

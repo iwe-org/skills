@@ -1,0 +1,44 @@
+name: Check Harbor evals
+
+on:
+  pull_request:
+    paths:
+      - "evals/harbor/**"
+      - "hooks/**"
+      - "agents/**"
+      - "skills/**"
+      - ".github/workflows/check-harbor-evals.yml"
+  push:
+    branches: [main]
+    paths:
+      - "evals/harbor/**"
+      - "hooks/**"
+      - "agents/**"
+      - "skills/**"
+      - ".github/workflows/check-harbor-evals.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  definitions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check shell syntax
+        run: |
+          for script in evals/harbor/check.sh evals/harbor/gate.sh \
+            evals/harbor/lib/assert.sh evals/harbor/image/setup-lib.sh \
+            evals/harbor/image/build-fixture.sh evals/harbor/image/render-settings.sh \
+            evals/harbor/image/marker.sh; do
+            sh -n "$script"
+          done
+      - name: Install IWE
+        continue-on-error: true
+        run: npm install --global @iwe-org/iwe
+
+      - name: Install jq
+        run: sudo apt-get install -y --no-install-recommends jq
+      - name: Check the eval definitions
+        run: sh evals/harbor/check.sh

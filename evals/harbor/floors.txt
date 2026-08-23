@@ -1,0 +1,16 @@
+# Per-task reward floors for the scheduled Harbor run, one `<task> <floor>` per
+# line. `gate.sh` enforces them; with no entries it enforces nothing and says so.
+# Trials whose reward.json carries `agent_api_error: 1` (credit lapse, rate
+# limit, auth failure — stamped by lib/assert.sh) are excluded from the mean and
+# reported as skipped; a task with only such trials reads as no usable results
+# and fails, so an unfunded run can never pass a floor by accident.
+#
+# Leave this empty until a week of scheduled runs has shown what each task
+# actually scores. A floor guessed before then either never fires or fires on
+# every run, and both are worse than no floor.
+#
+# Example, once the numbers are known:
+#
+#   inert-without-memory 1.0
+#   stale-claim          1.0
+#   capture-e2e          0.7

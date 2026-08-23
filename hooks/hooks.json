@@ -1,0 +1,27 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact|fork",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "! command -v iwe >/dev/null 2>&1 || iwe internal claude hook session-start || [ $? -eq 2 ]",
+            "timeout": 20
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "! command -v iwe >/dev/null 2>&1 || iwe internal claude hook stop || [ $? -eq 2 ]",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  }
+}

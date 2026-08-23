@@ -1,0 +1,94 @@
+name: Harbor memory evals
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: Model for the main agent
+        default: anthropic/claude-sonnet-5
+      attempts:
+        description: Attempts per task (-k)
+        default: "3"
+      tasks:
+        description: Task path to run
+        default: evals/harbor/tasks
+      oracle_only:
+        description: Run only the oracle pass, no API cost
+        type: boolean
+        default: false
+      iwe_source:
+        description: Where the image gets iwe (npm, or copy from evals/harbor/image/bin/iwe)
+        default: npm
+      iwe_version:
+        description: IWE CLI version when iwe_source is npm
+        default: 0.19.1
+  schedule:
+    - cron: "17 6 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: harbor-evals
+  cancel-in-progress: false
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      MODEL: ${{ inputs.model || 'anthropic/claude-sonnet-5' }}
+      ATTEMPTS: ${{ inputs.attempts || '3' }}
+      TASKS: ${{ inputs.tasks || 'evals/harbor/tasks' }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install IWE
+        continue-on-error: true
+        run: npm install --global @iwe-org/iwe@${{ inputs.iwe_version || '0.19.1' }}
+
+      - name: Check the task definitions
+        run: sh evals/harbor/check.sh
+
+      - name: Build the shared image
+        run: |
+          docker build -f evals/harbor/image/Dockerfile -t iwe-memory-evals:latest \
+            --build-arg IWE_SOURCE="${{ inputs.iwe_source || 'npm' }}" \
+            --build-arg IWE_VERSION="${{ inputs.iwe_version || '0.19.1' }}" .
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install Harbor
+        run: |
+          uv tool install harbor
+          harbor --version
+
+      - name: Oracle pass
+        run: |
+          harbor run -p "$TASKS" --agent oracle \
+            -o "$GITHUB_WORKSPACE/harbor-jobs" --job-name oracle-${{ github.run_id }}
+
+      - name: Model pass
+        if: ${{ !inputs.oracle_only }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "ANTHROPIC_API_KEY is not set for this repository; skipping the model pass" >&2
+            exit 1
+          fi
+          harbor run -p "$TASKS" --agent claude-code -m "$MODEL" \
+            -k "$ATTEMPTS" -n 4 \
+            -o "$GITHUB_WORKSPACE/harbor-jobs" --job-name model-${{ github.run_id }}
+
+      - name: Upload the Harbor job directory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: harbor-jobs-${{ github.run_id }}
+          path: harbor-jobs
+          retention-days: 30
+
+      - name: Enforce the reward floors
+        if: ${{ !inputs.oracle_only }}
+        run: sh evals/harbor/gate.sh "$GITHUB_WORKSPACE/harbor-jobs/model-${{ github.run_id }}"
