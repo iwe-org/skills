@@ -4,7 +4,7 @@ multi_step_reward_strategy = "mean"
 [task]
 name = "iwe/inert-without-memory"
 version = "0.1.0"
-description = "Without a MEMORY.md document the plugin does nothing at all — in a workspace or outside one — and the transcript it left alone is still capturable from line zero once the policy exists."
+description = "Without a MEMORY.md document the plugin does nothing at all — in a workspace or outside one — and the session it left alone is still readable from line zero once the policy exists."
 
 [metadata]
 category = "memory"

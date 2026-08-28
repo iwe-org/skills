@@ -4,7 +4,7 @@ multi_step_reward_strategy = "mean"
 [task]
 name = "iwe/agnostic-store"
 version = "0.1.0"
-description = "A store with its own ontology and a MEMORY.md policy that describes it: capture writes documents in that shape, and nothing from any default ontology appears."
+description = "A store with its own ontology (zettel documents, own schema and template, own key prefix) and a policy describing it: a distill run writes that shape, and nothing from any default ontology appears."
 
 [metadata]
 category = "memory"

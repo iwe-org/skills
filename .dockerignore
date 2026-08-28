@@ -1,0 +1,10 @@
+# The build context is the skills repository, and the image bakes in only the
+# plugin and the eval definitions. Everything here would otherwise ride along:
+# `private/` is the memory store (a nested git repository), and `.git/` is the
+# whole history of this one.
+private/
+.git/
+.github/
+.claude/
+node_modules/
+jobs/

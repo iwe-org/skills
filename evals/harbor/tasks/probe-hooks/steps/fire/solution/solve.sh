@@ -6,11 +6,10 @@ set -eu
 SEEDED=7a1c9f20-0000-4000-8000-00000000ab01
 
 head -1 README.md
+printf 'CLAUDE_CODE_SESSION_ID=%s\n' "${CLAUDE_CODE_SESSION_ID:-unset}"
 
-eval_stream_note '<iwe-memory> index injected at session start. The `queries` document is this store'"'"'s query cookbook.'
-eval_stream_note 'Agent tool: {"subagent_type":"distill"} run_in_background true'
-eval_sweep "$SEEDED"
-eval_seed_doc probe-deploy-gate "$(date '+%Y-%m-%d %H:%M')" \
-  "make deploy needs DEPLOY_ENV and a built bundle" \
-  "bin/deploy.sh exits 3 with 'DEPLOY_ENV is unset (RB-417)' until DEPLOY_ENV names a target from ops/runbook-417.txt, and exits 2 until make build has written dist/releasekit.tar.gz."
-eval_complete_capture "$SEEDED" probe-deploy-gate
+eval_hook session-start
+eval_stream_note "$(cat "$EVAL_NOTES/hook-session-start.out" 2>/dev/null)"
+eval_stream_note "CLAUDE_CODE_SESSION_ID=${CLAUDE_CODE_SESSION_ID:-unset}"
+eval_session list >"$EVAL_NOTES/session-list.out" 2>&1 || :
+eval_note "the listing saw $SEEDED"

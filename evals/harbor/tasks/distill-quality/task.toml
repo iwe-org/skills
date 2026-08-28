@@ -1,0 +1,32 @@
+schema_version = "1.4"
+
+[task]
+name = "iwe/distill-quality"
+version = "0.1.0"
+description = "Document recall, precision and shape: a distill run over a dense session with every proposal pre-selected by the user, scored against a labelled gold set — nothing decoy written, no secret written, one fact per document, the fact the store already held updated in place."
+
+[metadata]
+category = "memory"
+tags = ["iwe", "memory", "distill", "quality", "gold"]
+
+[environment]
+docker_image = "iwe-memory-evals:latest"
+workdir = "/app"
+network_mode = "public"
+build_timeout_sec = 900.0
+
+[agent]
+timeout_sec = 900.0
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "shared"
+
+[[steps]]
+name = "keep"
+
+[steps.agent]
+timeout_sec = 900.0
+
+[steps.verifier]
+timeout_sec = 300.0

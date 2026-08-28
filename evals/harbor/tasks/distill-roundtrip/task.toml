@@ -1,0 +1,42 @@
+schema_version = "1.4"
+multi_step_reward_strategy = "mean"
+
+[task]
+name = "iwe/distill-roundtrip"
+version = "0.1.0"
+description = "The number that matters: a distill run writes what a dense session established, then a fresh session with no transcript has to answer eight questions from those documents alone."
+
+[metadata]
+category = "memory"
+tags = ["iwe", "memory", "distill", "recall", "quality", "gold"]
+
+[environment]
+docker_image = "iwe-memory-evals:latest"
+workdir = "/app"
+network_mode = "public"
+build_timeout_sec = 900.0
+
+[agent]
+timeout_sec = 900.0
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "shared"
+
+[[steps]]
+name = "distill"
+
+[steps.agent]
+timeout_sec = 900.0
+
+[steps.verifier]
+timeout_sec = 300.0
+
+[[steps]]
+name = "recall"
+
+[steps.agent]
+timeout_sec = 900.0
+
+[steps.verifier]
+timeout_sec = 300.0

@@ -1,0 +1,32 @@
+schema_version = "1.4"
+
+[task]
+name = "iwe/distill-unattended"
+version = "0.1.0"
+description = "A distill run with nobody to select: it may read and list what it would propose, but it writes no document and distils nothing. The regression test for the failure that made capture manual."
+
+[metadata]
+category = "memory"
+tags = ["iwe", "memory", "distill", "unattended"]
+
+[environment]
+docker_image = "iwe-memory-evals:latest"
+workdir = "/app"
+network_mode = "public"
+build_timeout_sec = 900.0
+
+[agent]
+timeout_sec = 900.0
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "shared"
+
+[[steps]]
+name = "headless"
+
+[steps.agent]
+timeout_sec = 900.0
+
+[steps.verifier]
+timeout_sec = 300.0

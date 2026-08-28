@@ -1,0 +1,14 @@
+# Question set for tail-dense.jsonl. Tab-separated: n, class, question, require, forbid, answer.
+# class: gold — one question per gold row, in gold order; stale — answerable from the
+# repository and contradicted by a seeded document. require: ERE patterns separated
+# by ;; that an answer must all match; forbid: patterns it must not match. The
+# patterns avoid every word the question uses. answer: what the oracle writes.
+1	gold	Which deploy target do release trains use right now, and why not the other one?	staging-blue;;frozen|freeze|rewrite|parser|RB-417		staging-blue — staging-green is frozen for the parser rewrite until RB-417 closes.
+2	gold	What went wrong when `set -o pipefail` was added to `bin/deploy.sh`?	busybox|illegal option|deploy hosts? (shell|sh)		The deploy hosts run busybox sh, which rejects it: "set: Illegal option -o pipefail"; it was reverted.
+3	gold	How long does the load-balancer drain take, and which runbook records it?	150		150 seconds, recorded in RB-533; nobody deploys inside a drain window.
+4	gold	What does the nightly smoke hook need that the repository does not provide, and where does its value live?	SMOKE_TOKEN;;vault		SMOKE_TOKEN, which CI reads from the vault path ops/vault/releasekit-smoke (RB-590).
+5	gold	Why does `git init --initial-branch` fail on the deploy hosts, and what is used instead?	2\.30|symbolic-ref		The hosts run git 2.30, which predates the option; a plain init then git symbolic-ref HEAD refs/heads/main (RB-611).
+6	gold	When do release trains cut, and when does code freeze start?	tuesday;;friday		Trains cut Tuesdays at 10:00 UTC; freeze starts Friday 16:00 UTC.
+7	gold	What is required before anyone edits `ops/runbook-417.txt`?	OPS-|sign-?off		An OPS- ticket and ops sign-off, because bin/deploy.sh parses the file.
+8	gold	Where does `make test` run, and why not on the deploy hosts?	build host;;RB-622|busybox		On the build host only; under busybox the parser test fails (RB-622).
+9	stale	What exit code does `make deploy` return when `DEPLOY_ENV` is unset?	(^|[^0-9])3([^0-9]|$)	(^|[^0-9])7([^0-9]|$)	Exit 3 — bin/deploy.sh says so; the memory document claiming otherwise is stale.

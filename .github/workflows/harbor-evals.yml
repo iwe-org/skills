@@ -21,7 +21,7 @@ on:
         default: npm
       iwe_version:
         description: IWE CLI version when iwe_source is npm
-        default: 0.19.1
+        default: 0.21.0
   schedule:
     - cron: "17 6 * * 1"
 
@@ -45,7 +45,7 @@ jobs:
 
       - name: Install IWE
         continue-on-error: true
-        run: npm install --global @iwe-org/iwe@${{ inputs.iwe_version || '0.19.1' }}
+        run: npm install --global @iwe-org/iwe@${{ inputs.iwe_version || '0.21.0' }}
 
       - name: Check the task definitions
         run: sh evals/harbor/check.sh
@@ -54,7 +54,7 @@ jobs:
         run: |
           docker build -f evals/harbor/image/Dockerfile -t iwe-memory-evals:latest \
             --build-arg IWE_SOURCE="${{ inputs.iwe_source || 'npm' }}" \
-            --build-arg IWE_VERSION="${{ inputs.iwe_version || '0.19.1' }}" .
+            --build-arg IWE_VERSION="${{ inputs.iwe_version || '0.21.0' }}" .
 
       - uses: astral-sh/setup-uv@v5
 

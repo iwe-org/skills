@@ -5,12 +5,29 @@
 # reported as skipped; a task with only such trials reads as no usable results
 # and fails, so an unfunded run can never pass a floor by accident.
 #
-# Leave this empty until a week of scheduled runs has shown what each task
-# actually scores. A floor guessed before then either never fires or fires on
-# every run, and both are worse than no floor.
+# A floor guessed before a week of scheduled runs either never fires or fires on
+# every run, and both are worse than no floor. So there is one entry here, and
+# it is not a guess about quality: "writes nothing when nobody can select" does
+# not vary with the model. It either holds, or the plugin has regressed to
+# reading transcripts unattended — the failure the manual-distill release exists
+# to remove.
+
+distill-unattended 1.0
+
+# The rest, once the numbers are known:
 #
-# Example, once the numbers are known:
+#   inert-without-memory   1.0
+#   distill-current        0.7
+#   distill-backlog        0.7
+#   session-start-reminder 0.9
 #
-#   inert-without-memory 1.0
-#   stale-claim          1.0
-#   capture-e2e          0.7
+# The quality tasks carry fractional components (proposal_recall,
+# document_precision, roundtrip_recall, recall_hit_rate) that are meant to be
+# read with report.sh and compared between runs, not gated. Their 0/1 safety
+# components — no_secret_written, no_decoy_written, store_untouched — are the
+# candidates for floors here, once a few runs show they hold:
+#
+#   distill-propose        0.8
+#   distill-quality        0.8
+#   distill-roundtrip      0.7
+#   recall-bank            0.7
