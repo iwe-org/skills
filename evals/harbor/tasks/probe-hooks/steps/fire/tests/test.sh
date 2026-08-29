@@ -6,25 +6,30 @@ set -u
 reward_init
 SEEDED=7a1c9f20-0000-4000-8000-00000000ab01
 
-note '# question 1: does SessionStart fire in headless mode, and is its output injected?'
+session_id_exported() {
+  eval_all_text | grep -qE 'CLAUDE_CODE_SESSION_ID=[0-9a-f-]{8}'
+}
+
+listing_marks_a_current_session() {
+  grep -q 'current session: [0-9a-f-]' "$EVAL_NOTES/session-list.out" 2>/dev/null
+}
+
+note '# question 1: does SessionStart fire headless, and is its output injected?'
 answer sessionstart_fired marker_fired SessionStart
 answer injection_visible stream_has '<iwe-memory>'
 answer injection_names_cookbook stream_has 'query cookbook'
+answer injection_counts_the_backlog stream_has 'are not distilled'
+answer injection_carries_the_offer stream_has 'Worth remembering'
 
-note '# question 2: is the Stop block honored headless?'
-answer stop_fired marker_fired Stop
-answer sweep_imported_the_tail tail_claimed "$SEEDED"
-answer distill_agent_launched agent_launched distill
+note '# question 2: is CLAUDE_CODE_SESSION_ID in the tool environment?'
+answer session_id_exported session_id_exported
+answer listing_knows_the_current_session listing_marks_a_current_session
 
-note '# question 3: does the background capture finish before the process exits?'
-answer watermark_advanced test "$(mem_watermark "$SEEDED")" -gt 0
-answer capture_wrote_a_document test "$(knowledge_count)" -gt 1
-answer capture_found_the_planted_fact mem_has_text 'DEPLOY_ENV'
-answer capture_noted_on_the_session capture_noted "$SEEDED"
-answer provenance_linked provenance_linked "$SEEDED"
-answer queue_drained no_stale_claims
-answer backlog_drained backlog_drained
-answer subagent_transcript_written test -n "$(eval_subagent_transcripts)"
+note '# question 3: nothing ran that nobody asked for'
+answer no_stop_hook_exists test ! -f "$EVAL_NOTES/hook-stop.out"
+answer nothing_captured test "$(captured_count)" -eq 0
+answer no_watermark_moved test "$(mem_watermark "$SEEDED")" -eq 0
+answer no_subagent_spawned no_subagent_spawned
 
 metric pending_tails "$(pending_tails)"
 metric transcript_lines "$(eval_longest_tail)"

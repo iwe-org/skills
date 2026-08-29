@@ -12,12 +12,13 @@
         ]
       }
     ],
-    "Stop": [
+    "PostToolUse": [
       {
+        "matcher": "Write|Edit|MultiEdit|Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "! command -v iwe >/dev/null 2>&1 || iwe internal claude hook stop || [ $? -eq 2 ]",
+            "command": "! command -v iwe >/dev/null 2>&1 || iwe internal claude hook post-tool 2>/dev/null || true",
             "timeout": 20
           }
         ]

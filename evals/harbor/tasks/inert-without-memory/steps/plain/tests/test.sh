@@ -15,14 +15,14 @@ hook_error_free() {
 }
 
 no_mechanical_documents() {
-  [ ! -d "$EVAL_APP/sessions" ]
+  [ ! -e "$EVAL_STATE" ] && [ ! -e "$EVAL_APP/sessions" ]
 }
 
 check task_completed test "$(cat "$EVAL_APP/count.txt" 2>/dev/null)" = "4"
 check_not memory_was_enabled memory_enabled
 check nothing_was_written no_mechanical_documents
 check no_watermark_exists test "$(mem_watermark "$SESSION")" -eq 0
-check_not blocked_the_session stream_has '"decision": "block"'
+check_not injected_an_index stream_has '<iwe-memory>'
 check_not launched_a_memory_agent agent_launched distill
 check hooks_stayed_quiet hooks_printed_nothing
 check no_hook_output_in_the_session hook_error_free

@@ -4,7 +4,7 @@ multi_step_reward_strategy = "mean"
 [task]
 name = "iwe/probe-hooks"
 version = "0.1.0"
-description = "Diagnostic: which IWE memory hooks fire under headless Claude Code, whether the Stop block is honored, whether a background capture finishes, and whether step log directories are shared."
+description = "Diagnostic: whether SessionStart fires under headless Claude Code and its injection reaches the model, whether CLAUDE_CODE_SESSION_ID is in the tool environment, and whether step log directories are shared."
 
 [metadata]
 category = "diagnostic"

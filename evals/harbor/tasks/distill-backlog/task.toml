@@ -1,0 +1,32 @@
+schema_version = "1.4"
+
+[task]
+name = "iwe/distill-backlog"
+version = "0.1.0"
+description = "Three undistilled sessions, a subagent directory and one conversation still live: the backlog lists newest-first, is worked one session at a time, never reads a subagent transcript, and leaves the live session alone."
+
+[metadata]
+category = "memory"
+tags = ["iwe", "memory", "distill", "backlog"]
+
+[environment]
+docker_image = "iwe-memory-evals:latest"
+workdir = "/app"
+network_mode = "public"
+build_timeout_sec = 900.0
+
+[agent]
+timeout_sec = 900.0
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "shared"
+
+[[steps]]
+name = "walk"
+
+[steps.agent]
+timeout_sec = 900.0
+
+[steps.verifier]
+timeout_sec = 300.0

@@ -14,7 +14,7 @@ fi
 }
 
 rm -rf "$dest"
-mkdir -p "$dest/bin" "$dest/ops" "$dest/src/parser" "$dest/.claude/agents" "$dest/.claude/skills"
+mkdir -p "$dest/bin" "$dest/ops" "$dest/src/parser" "$dest/.claude/skills"
 
 cat >"$dest/README.md" <<'EOF'
 # releasekit
@@ -133,6 +133,9 @@ set -u
 target=${DEPLOY_ENV:-}
 printf '%s %s\n' "$(date -u '+%H:%M:%S')" "${target:-<unset>}" >>.deploy-attempts
 
+# How many times a push is retried while the load balancer drains a node.
+RETRY_BUDGET=${RETRY_BUDGET:-3}
+
 if [ ! -f dist/releasekit.tar.gz ]; then
   printf 'deploy.sh: refusing to run: dist/releasekit.tar.gz is missing, run make build first\n' >&2
   exit 2
@@ -146,9 +149,15 @@ fi
 known=$(sed -n 's/^  target: //p' ops/runbook-417.txt 2>/dev/null)
 for candidate in $known; do
   if [ "$candidate" = "$target" ]; then
-    printf '%s\n' "$target" >.deploy-receipt
-    printf 'deploy.sh: deployed dist/releasekit.tar.gz to %s\n' "$target"
-    exit 0
+    attempt=0
+    while [ "$attempt" -lt "$RETRY_BUDGET" ]; do
+      attempt=$((attempt + 1))
+      printf '%s\n' "$target" >.deploy-receipt
+      printf 'deploy.sh: deployed dist/releasekit.tar.gz to %s\n' "$target"
+      exit 0
+    done
+    printf 'deploy.sh: gave up after %s attempt(s)\n' "$RETRY_BUDGET" >&2
+    exit 5
   fi
 done
 
@@ -190,8 +199,6 @@ chmod +x "$dest"/bin/*.sh "$dest/src/parser/parse.sh"
 
 sh "$(dirname -- "$0")/render-settings.sh" "$repo/hooks/hooks.json" \
   "$dest/.claude/settings.json"
-
-cp "$repo/agents/distill.md" "$dest/.claude/agents/distill.md"
 
 for skill in init distill reflect; do
   mkdir -p "$dest/.claude/skills/$skill"

@@ -16,12 +16,15 @@ shared_log_dir() {
 
 note '# question 4: does a later step see the previous step transcripts?'
 answer step_log_dir_shared shared_log_dir
-answer earlier_tail_reswept tail_claimed "$SEEDED"
-answer distill_agent_launched agent_launched distill
+answer earlier_session_still_listed session_listed "$SEEDED"
+
+note '# and the backlog is still nobody read'
+answer no_watermark_moved test "$(mem_watermark "$SEEDED")" -eq 0
+answer no_subagent_spawned no_subagent_spawned
 
 metric session_dirs "$(eval_session_dirs | grep -c .)"
 metric transcripts_total "$(eval_transcripts | grep -c .)"
-metric watermark_after "$(mem_watermark "$SEEDED")"
+metric pending_tails "$(pending_tails)"
 
 score probe_recorded 1
 reward_write

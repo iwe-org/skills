@@ -1,0 +1,32 @@
+schema_version = "1.4"
+
+[task]
+name = "iwe/post-tool-net"
+version = "0.1.0"
+description = "The PostToolUse net over the agent's own writes: a store document edited with the Write or Edit tool lands in canonical form anyway, while files the net does not own are left byte-for-byte alone and nothing is captured."
+
+[metadata]
+category = "memory"
+tags = ["iwe", "memory", "post-tool", "normalize"]
+
+[environment]
+docker_image = "iwe-memory-evals:latest"
+workdir = "/app"
+network_mode = "public"
+build_timeout_sec = 900.0
+
+[agent]
+timeout_sec = 900.0
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "shared"
+
+[[steps]]
+name = "edit"
+
+[steps.agent]
+timeout_sec = 900.0
+
+[steps.verifier]
+timeout_sec = 300.0

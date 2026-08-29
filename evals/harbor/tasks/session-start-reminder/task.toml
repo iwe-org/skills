@@ -1,0 +1,42 @@
+schema_version = "1.4"
+multi_step_reward_strategy = "mean"
+
+[task]
+name = "iwe/session-start-reminder"
+version = "0.1.0"
+description = "The one thing that still happens on its own: session start shows how many sessions are undistilled and, on a cadence, asks the assistant to offer a distill run — once, and not again inside the window."
+
+[metadata]
+category = "memory"
+tags = ["iwe", "memory", "session-start", "reminder"]
+
+[environment]
+docker_image = "iwe-memory-evals:latest"
+workdir = "/app"
+network_mode = "public"
+build_timeout_sec = 900.0
+
+[agent]
+timeout_sec = 600.0
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "shared"
+
+[[steps]]
+name = "first"
+
+[steps.agent]
+timeout_sec = 600.0
+
+[steps.verifier]
+timeout_sec = 300.0
+
+[[steps]]
+name = "repeat"
+
+[steps.agent]
+timeout_sec = 600.0
+
+[steps.verifier]
+timeout_sec = 300.0

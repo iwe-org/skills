@@ -1,0 +1,62 @@
+# One distractor document per line: title|body. Seeded around the bank facts so
+# recall has to find eight documents among seventy, not among eight.
+Bundle checksum is written beside the tarball|bin/build.sh does not write a checksum today; the ops wiki claims it does. A sha256 beside dist/releasekit.tar.gz was discussed and dropped in favour of the registry's own digest.
+Deploy receipts are plain text with a trailing newline|.deploy-receipt holds exactly one line, the target name, and the smoke hook reads it with read -r. A missing trailing newline made the hook see an empty target once.
+The Makefile is POSIX make, not GNU make|Nothing in the Makefile may use GNU extensions: the build host runs bmake on Fridays for the reproducibility check and pattern rules break it.
+greet.sh is a smoke canary, not a feature|bin/greet.sh exists so the test suite has something trivially green; removing it makes bin/test.sh exit early with no output.
+The parser ignores lines starting with a hash only at column one|src/parser/parse.sh strips comments only when the hash is the first character; an indented hash is significant and this is relied upon by ops configs.
+dist is gitignored and never committed|A dist/ directory checked in by accident in June doubled the clone size; the .gitignore entry is the only guard.
+The build host is Debian 12|Everything that is not the deploy hosts runs on Debian 12 with dash as /bin/sh, which is why scripts that pass CI can still fail on a deploy host.
+Deploy hosts have no curl|Fetching anything on a deploy host goes through wget; curl is not installed and the ops team will not add it.
+Release bundle retention is thirty days|The registry keeps thirty days of bundles; anything older has to be rebuilt from the tag, which is why tags are never deleted.
+Runbook files are plain text on purpose|ops/*.txt stay plain text so bin/deploy.sh can sed them; a proposal to move them to YAML was rejected because busybox has no YAML parser.
+The tarball uses ustar format|bin/build.sh relies on tar's default, which is ustar on the build host; pax headers confused the deploy hosts' busybox tar once.
+Symlinks in the bundle are not followed|tar czf in bin/build.sh archives symlinks as symlinks; a symlink out of the repository turned up dangling on a deploy host.
+The smoke hook runs at 23:00 UTC nightly|The nightly smoke job is scheduled at 23:00 UTC by CI, after the last European deploy window closes.
+Smoke checks are fourteen shell probes|.ci/smoke.sh runs fourteen probes against the deployed target; a fifteenth was added and removed the same week for flakiness.
+staging-blue is the larger of the two targets|staging-blue has twice the instances of staging-green, which is why load tests only mean anything on blue.
+Release channel announcements are the source of truth for rotations|Target rotations and freezes are announced in the release channel; the runbook explicitly defers to it.
+The deploy log is rotated weekly|/var/log/releasekit/ on the deploy hosts rotates on Sunday night; a failure investigated on Monday morning may already be in the .1 file.
+Exit code 4 means an unknown deploy target|bin/deploy.sh exits 4 with 'unknown deploy target' when DEPLOY_ENV names something not in the runbook; this is the most common typo failure.
+Exit code 5 means the retry budget was exhausted|bin/deploy.sh exits 5 after RETRY_BUDGET attempts; it has never actually happened outside a test.
+The ops team owns the vault namespace|Everything under ops/vault/ is owned by the ops team; developers get read leases only, renewed monthly.
+Vault leases expire after thirty days|A read lease on an ops/vault path lasts thirty days; a job that keeps a lease longer reads stale values after rotation.
+CI runs the test suite on every push|The build host runs make test on every push to main; deploy hosts never run it.
+Build artifacts are uploaded by the CI job, not by make|make build writes dist/ locally; the CI job uploads it to the registry in a separate step that make never sees.
+The registry rejects bundles over five megabytes|The bundle registry enforces a 5 MB limit; the smoke hook checks it too so the failure is local rather than remote.
+Deploy targets are lower-case hyphenated names|Target names follow the pattern <env>-<colour>; anything else is rejected by the runbook parse in bin/deploy.sh.
+There is no production target in this repository|Production deploys happen from a different repository; releasekit only knows staging targets by design.
+The release channel is where freezes are announced|Freezes never appear in the repository; the channel history is the only record before this store existed.
+Runbook numbering is assigned by ops|RB- numbers are allocated by the ops team sequentially; there is no index file in the repository.
+Commit messages carry the ticket number|Every commit touching ops/ names its ticket in the subject line; the ops team greps history by ticket number when auditing a change.
+The parser README is a stub|src/parser/README.md says only that the parser reads a config stream; the real behaviour is in parse.sh.
+Config streams are newline-delimited key=value|The parser expects key=value lines; anything else passes through unchanged, which surprises people expecting validation.
+Tests use a hand-rolled expect helper|bin/test.sh defines its own expect function rather than using a framework; keep it that way, the deploy hosts have nothing else.
+Test output is not TAP|bin/test.sh prints ok/FAIL lines, not TAP; a TAP consumer in CI was tried and dropped.
+Build takes under a second|make build on the build host completes in well under a second; anything slower means dist/ has stale files in it.
+Deploy takes about four seconds per attempt|A single deploy attempt takes about four seconds against staging-blue, mostly the receipt write and log flush.
+The receipt is overwritten, not appended|.deploy-receipt holds only the last target; .deploy-attempts is the append-only history.
+Attempt history includes unset targets|.deploy-attempts records <unset> when DEPLOY_ENV was empty, which is how blind attempts are counted after the fact.
+The date in the attempts log is UTC|bin/deploy.sh stamps .deploy-attempts with date -u; the deploy hosts are set to UTC anyway.
+The build host clock drifts|The build host's clock has drifted by up to forty seconds; timestamps across hosts are not comparable to the second.
+Git tags mark every train|Every release train is tagged train/YYYY-MM-DD on the build host after the deploy succeeds.
+Tags are pushed by ops, not by the deploy script|bin/deploy.sh never pushes tags; the ops rotation does it after smoke passes.
+Rollback is a redeploy of the previous tag|There is no rollback command; rolling back means checking out the previous train tag and running make build then make deploy.
+The previous bundle is not kept on the deploy host|Deploy hosts keep only the current bundle; a rollback always rebuilds.
+Deploy hosts are reachable by ssh from the build host only|Direct ssh to a deploy host from a laptop is blocked; go through the build host.
+The ssh user on deploy hosts is releasekit|All deploy-host commands run as the releasekit user, which has no sudo.
+Deploy host home directories are read-only|The releasekit user's home on a deploy host is read-only; anything that writes to $HOME fails silently.
+There are two deploy hosts per target|Each staging target has two hosts; the load balancer drains one at a time during a deploy.
+Health checks poll every ten seconds|The load balancer health check polls each host every ten seconds; a deploy that finishes inside one interval is invisible to it.
+The shell test suite has no network access|CI runs make test with networking disabled; a test that needs the network fails with a confusing timeout.
+Environment variables are the only configuration|releasekit reads no config file; DEPLOY_ENV and RETRY_BUDGET are the whole interface.
+RETRY_BUDGET is rarely changed|The default of 3 has been in place since the script was written; changing it needs an OPS ticket like any deploy behaviour change.
+The Makefile has no clean target|There is no make clean; rm -rf dist is the way, and it is safe because dist is a build output only.
+Logs on deploy hosts are owned by root|/var/log/releasekit is root-owned; the releasekit user can read but not truncate it.
+The build host is shared with two other projects|The build host also builds the docs site and the parser team's tooling; a stuck build there blocks all three.
+Trains never run on public holidays|The Tuesday train is skipped on UK public holidays; the next train is the following Tuesday, not Wednesday.
+Freeze exceptions need two approvals|Deploying during a freeze requires approval from the release owner and the ops lead, recorded in the channel.
+The parser team runs load tests on Thursdays|Thursday afternoons the parser team runs load tests; deploys that overlap them produce noisy smoke numbers.
+Smoke failures page the release owner|A red smoke job pages the release owner, not ops; ops are paged only for host-level failures.
+Smoke logs live under /var/log/releasekit|The smoke hook writes to smoke.log beside deploy.log on the deploy host that ran it.
+The ops wiki is out of date|The ops wiki page for releasekit predates the runbook files and contradicts them in several places; the runbooks win.

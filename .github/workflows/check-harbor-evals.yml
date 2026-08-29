@@ -5,7 +5,6 @@ on:
     paths:
       - "evals/harbor/**"
       - "hooks/**"
-      - "agents/**"
       - "skills/**"
       - ".github/workflows/check-harbor-evals.yml"
   push:
@@ -13,7 +12,6 @@ on:
     paths:
       - "evals/harbor/**"
       - "hooks/**"
-      - "agents/**"
       - "skills/**"
       - ".github/workflows/check-harbor-evals.yml"
   workflow_dispatch:
@@ -28,10 +26,10 @@ jobs:
       - uses: actions/checkout@v6
       - name: Check shell syntax
         run: |
-          for script in evals/harbor/check.sh evals/harbor/gate.sh \
+          for script in evals/harbor/check.sh evals/harbor/gate.sh evals/harbor/report.sh \
             evals/harbor/lib/assert.sh evals/harbor/image/setup-lib.sh \
             evals/harbor/image/build-fixture.sh evals/harbor/image/render-settings.sh \
-            evals/harbor/image/marker.sh; do
+            evals/harbor/image/marker.sh evals/quality/propose.sh evals/quality/mint-gold.sh; do
             sh -n "$script"
           done
       - name: Install IWE

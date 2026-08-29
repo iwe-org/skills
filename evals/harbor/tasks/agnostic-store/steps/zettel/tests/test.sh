@@ -4,7 +4,6 @@ set -u
 . "${IWE_EVAL_LIB:-/opt/iwe-evals/assert.sh}"
 
 reward_init
-wait_for 60 no_stale_claims
 SESSION=1a7f5b30-0000-4000-8000-0000000000b1
 
 wrote_a_zettel() {
@@ -33,11 +32,13 @@ check store_validates mem_valid
 check no_default_ontology no_default_ontology
 check fact_captured mem_has_text 'DEPLOY_ENV'
 
-note '# and the machinery still closed the loop'
+note '# and the flow still closed the loop'
 check watermark_advanced test "$(mem_watermark "$SESSION")" -gt 0
 check capture_noted_on_the_session capture_noted "$SESSION"
 check provenance_linked provenance_linked "$SESSION"
-check queue_drained no_stale_claims
+check backlog_drained backlog_drained
+check ledger_recorded test "$(session_kept "$SESSION")" -gt 0
+check no_subagent_spawned no_subagent_spawned
 
 metric zettels "$(mem_count '{ type: zettel }')"
 metric knowledge_documents "$(knowledge_count)"

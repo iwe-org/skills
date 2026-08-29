@@ -1,0 +1,32 @@
+schema_version = "1.4"
+
+[task]
+name = "iwe/distill-current"
+version = "0.1.0"
+description = "A foreground distill run over the session at hand: it proposes with evidence, writes what the user named, advances the distilled line, records the ledger — and refuses to record a recommendation the user never confirmed."
+
+[metadata]
+category = "memory"
+tags = ["iwe", "memory", "distill", "evidence"]
+
+[environment]
+docker_image = "iwe-memory-evals:latest"
+workdir = "/app"
+network_mode = "public"
+build_timeout_sec = 900.0
+
+[agent]
+timeout_sec = 900.0
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "shared"
+
+[[steps]]
+name = "propose"
+
+[steps.agent]
+timeout_sec = 900.0
+
+[steps.verifier]
+timeout_sec = 300.0

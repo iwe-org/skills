@@ -1,0 +1,34 @@
+schema_version = "1.4"
+multi_step_reward_strategy = "mean"
+
+[task]
+name = "iwe/recall-bank"
+version = "0.1.0"
+description = "A question bank over a realistic store: eight facts seeded among sixty distractors and one stale document the repository contradicts. Scores how many answers reach the seeded fact, and whether the stale one is checked against the code. Paired with iwe/recall-bank-baseline."
+
+[metadata]
+category = "memory"
+tags = ["iwe", "memory", "recall", "bank"]
+pair = "iwe/recall-bank-baseline"
+
+[environment]
+docker_image = "iwe-memory-evals:latest"
+workdir = "/app"
+network_mode = "public"
+build_timeout_sec = 900.0
+
+[agent]
+timeout_sec = 900.0
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "shared"
+
+[[steps]]
+name = "answer"
+
+[steps.agent]
+timeout_sec = 900.0
+
+[steps.verifier]
+timeout_sec = 300.0

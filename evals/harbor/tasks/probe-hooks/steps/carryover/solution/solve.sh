@@ -6,6 +6,4 @@ set -eu
 ls ops/
 
 eval_seed_transcript tail-busywork.jsonl 7a1c9f20-0000-4000-8000-00000000ab02
-eval_stream_note 'Agent tool: {"subagent_type":"distill"} run_in_background true'
-eval_watermark 7a1c9f20-0000-4000-8000-00000000ab01 85
-eval_release_dead_claims
+eval_session list --all >"$EVAL_NOTES/session-list.out" 2>&1 || :
