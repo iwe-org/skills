@@ -11,7 +11,7 @@ Gives agents bounded, graph-aware routes for finding, retrieving, creating, and 
 Requirements:
 
 - an IWE workspace;
-- IWE CLI `>=0.20.0` — install via `npm install -g @iwe-org/iwe`, `brew tap iwe-org/iwe && brew install iwe`, or `cargo install iwe`;
+- IWE CLI `>=0.20.0` — install via `npm install -g @iwe-org/iwe`, `brew install iwe-org/iwe/iwe`, or `cargo install iwe`;
 - an agent runtime that supports skills.
 
 Install with the skills CLI (works with Claude Code, Codex, Cursor, OpenCode, and many other agents):
@@ -86,7 +86,7 @@ and writes only what you pick.
 
    ```bash
    npm install -g @iwe-org/iwe
-   # or: brew tap iwe-org/iwe && brew install iwe
+   # or: brew install iwe-org/iwe/iwe
    # or: cargo install iwe
    ```
 
