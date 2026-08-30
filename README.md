@@ -68,8 +68,8 @@ plugin's prefixed `/iwe:init` is unambiguous, and asking in plain words
 
 Installed as a Claude Code plugin, `iwe` also carries durable session memory.
 Memory is not a database the agent accretes — it is a knowledge base you
-co-author: plain markdown in the repository's own IWE workspace, reviewed as a
-normal diff. There is no separate memory directory and no second graph:
+co-author: plain markdown in the repository's own IWE workspace, reviewed as
+ordinary files. There is no separate memory directory and no second graph:
 captured notes sit beside your project's markdown, link to it, and are found by
 the same queries.
 
@@ -159,12 +159,11 @@ Two things, and neither of them decides what to remember.
 **At session start** the plugin injects a token-budgeted index of memory —
 titles and keys, never content — plus how many sessions are still undistilled
 and the commands for going deeper. What goes in is the policy's `injection`
-knob: a list of slices the binary runs in order, each a `filter` over the
-store's frontmatter, `recent: true` for the newest documents, or `changed: true`
-for documents whose bodies name a file `git status` reports. A store with
-`kind: rule` and `status: open` fields puts its rules and its open traps in
-front of every session, then what touches the files being edited, then the
-recent ones — deterministic queries the user owns, no model in the loop. At
+knob: a list of slices the binary runs in order, each a `filter` and/or a
+`sort` over the store's frontmatter, with an optional `heading` and `limit`. A
+store with `kind: rule` and `status: open` fields puts its rules and its open
+traps in front of every session, then the recent ones — deterministic queries
+the user owns, no model in the loop. At
 most once a week it also asks the assistant to offer a distill run at the next
 natural pause.
 
@@ -200,20 +199,25 @@ pick.
 ### Tune it
 
 The frontmatter of `MEMORY.md` carries the mechanical knobs, all optional, all
-defaulted: `chunk_chars` (how much conversation one read serves),
-`max_proposals_per_read`, `remind_every_days` (`0` to never remind),
-`injection_max_tokens`, `knowledge_filter` (which documents are memory),
-`recency_field`, and `injection` — the slices session start renders:
+defaulted: `distill` — how sessions are read: `max_chunk_size` (how much
+conversation one read serves, 25000), `max_proposals` (5) and
+`remind_after_days` (7; `-1` to never remind, `0` to remind every session) —
+and `injection`, the slices session start renders, each a `filter` and/or a
+`sort` with an optional `heading`, `limit` and `max_tokens`:
 
 ```yaml
+distill:
+  max_chunk_size: 25000
+  max_proposals: 5
+  remind_after_days: 7
 injection:
-  - { heading: "Rules this store keeps:", filter: { kind: rule }, limit: 10 }
+  - { heading: "Rules this store keeps:", filter: { kind: rule }, limit: 10, max_tokens: 400 }
   - { heading: "Still open:", filter: { kind: trap, status: open }, limit: 10 }
-  - { heading: "Mentioning files changed in the working tree:", changed: true, limit: 5 }
-  - { heading: "Most recently recorded:", recent: true, limit: 10 }
+  - { heading: "Most recently recorded:", filter: { created: { $exists: true } }, sort: created:-1, limit: 10 }
 ```
 
-Each has an `IWE_<KNOB>` environment twin. The body is re-read on every run,
+Each has an environment twin named for its path with dots as underscores
+(`IWE_DISTILL_MAX_PROPOSALS`). The body is re-read on every run,
 so a policy edit takes effect immediately.
 
 To turn memory off, delete `MEMORY.md` — nothing else changes, and re-adding it
