@@ -6,4 +6,4 @@ allowed-tools: Bash(iwe:*), AskUserQuestion
 ---
 !`iwe internal claude prompt distill`
 
-Without injection, run `iwe internal claude prompt distill` and follow it; an unknown command means iwe is older than 0.21.0 — say so and stop.
+Without injection, run `iwe internal claude prompt distill` and follow it; an unknown command means `iwe` is older than 0.21.0 — say so and stop.

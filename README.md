@@ -1,6 +1,8 @@
-## IWE Agentic AI Skills
+# IWE agent skills
 
-Main repository is here https://github.com/iwe-org/iwe
+Agent skills for [IWE](https://iwe.md), a Markdown knowledge base you and your AI agent work on together.
+
+The IWE source code, CLI and LSP server live in the [main repository](https://github.com/iwe-org/iwe).
 
 ## Available skills
 

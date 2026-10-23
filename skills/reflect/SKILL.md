@@ -6,4 +6,4 @@ allowed-tools: Bash(iwe:*)
 ---
 !`iwe internal claude prompt reflect`
 
-Without injection, run `iwe internal claude prompt reflect` and follow it; an unknown command means iwe is older than 0.21.0 — say so and stop.
+Without injection, run `iwe internal claude prompt reflect` and follow it; an unknown command means `iwe` is older than 0.21.0 — say so and stop.

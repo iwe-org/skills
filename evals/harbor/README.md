@@ -534,7 +534,7 @@ present on Claude Code 2.1.x) and awaits a container run.
   user answering "leave it alone" — in the fixture project's own vocabulary
   rather than by copying the session it actually happened in. Copying that
   session verbatim would have baked one machine's absolute paths into a public
-  repository and made the test depend on iwe's internals instead of
+  repository and made the test depend on IWE's internals instead of
   releasekit's.
 - **`recall-baseline` scores only what is achievable without memory**
   (`deploy_succeeded`, `answer_written`), so its oracle can reach 1.0. The

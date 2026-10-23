@@ -3,6 +3,6 @@
   "description": "IWE Memory — durable agent memory as markdown in the repository's own IWE workspace, read with you and written only when you select it — plus CLI skills for finding, retrieving, creating, and safely refactoring Markdown knowledge graphs",
   "version": "0.14.0",
   "author": { "name": "iwe-org" },
-  "homepage": "https://iwe.md",
+  "homepage": "https://iwe.md/docs/agentic/",
   "repository": "https://github.com/iwe-org/skills"
 }
